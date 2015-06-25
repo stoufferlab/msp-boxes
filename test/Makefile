@@ -1,0 +1,11 @@
+
+all: check
+
+clean:
+	rm -rf *dat
+
+check:
+	../src/ordering/ordering-kernel -f ../data/test-matrix.dat > /dev/null
+	../src/ordering/ordering-exhaustive -R > /dev/null
+	../src/boxes/main_boxes_greedy_nbox_ic_wdiag_kernel 171 coclas-exhaustive.dat 1 0 > check.dat
+	@ cmp ../data/test-clusters.dat check.dat > /dev/null || (echo Test failed && exit 1)
