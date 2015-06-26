@@ -5,7 +5,7 @@ AC_PREREQ([2.63])
 AC_INIT([msp-boxes], [0.76])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/ordering/ordering-io.hpp])
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CXX
