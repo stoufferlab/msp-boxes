@@ -17,7 +17,7 @@
 #include "ordering-annealing.hpp"
 #include "ordering-io.hpp"
 #include "ordering-tools.hpp"
-#include "ordering-templated.cpp"
+#include "ordering-templated.hpp"
 
 // namespaces
 using namespace std;

@@ -14,7 +14,7 @@
 #include "ordering-tools.hpp"
 
 // my templated functions
-#include "ordering-templated.cpp"
+#include "ordering-templated.hpp"
 
 // namespaces
 using namespace std;

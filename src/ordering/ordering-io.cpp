@@ -16,9 +16,7 @@
 // my header files
 #include "ordering-io.hpp"
 #include "ordering-tools.hpp"
-
-// my templated functions
-#include "ordering-templated.cpp"
+#include "ordering-templated.hpp"
 
 // namespaces
 using namespace std;

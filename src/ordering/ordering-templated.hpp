@@ -1,9 +1,11 @@
-#ifndef _ordering_templated_cpp_included_
-#define _ordering_templated_cpp_included_
+#ifndef _ordering_templated_hpp_included_
+#define _ordering_templated_hpp_included_
 
 // c++ header files
+#include <vector>
 
 // my header files
+
 
 // namespaces
 using namespace std;
