@@ -1,18 +1,17 @@
 
 //c++ header files
-#include <fstream>
-#include <iostream>
-#include <string>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <vector>
-#include <map>
 
 // my header files
-#include "ordering-tools.hpp"
-#include "ordering-io.hpp"
 #include "ordering-annealing.hpp"
+#include "ordering-io.hpp"
+#include "ordering-tools.hpp"
 
 // namespaces
 using namespace std;

@@ -2,19 +2,16 @@
 #define _ordering_tools_cpp_included_
 
 // c++ header files
+#include <algorithm>
 #include <cmath>
-#include <iostream>
-#include <fstream>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
+#include <iostream>
 #include <vector>
-
 
 // my header files
 #include "ordering-tools.hpp"
-
-// my templated functions
-#include "ordering-templated.hpp"
 
 // namespaces
 using namespace std;
@@ -245,7 +242,7 @@ vector <int> RandomizeOrder(int n, int nblocks){
     i = (int)(n*ran1f());
     i -= (i%nblocks);
 
-    while(Find(i,order)!=-1){
+    while(find(order.begin(),order.end(),i)!=order.end()){
       i = (int)(n*ran1f());
       i -= (i%nblocks);
     }    

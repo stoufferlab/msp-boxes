@@ -2,16 +2,14 @@
 #define _ordering_io_hpp_included_
 
 // c++ header files
-#include <fstream>
-#include <iostream>
-#include <string>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <vector>
 #include <ctime>
-// #include <cpgplot.h>
-#include <map>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
 
 // my header files
 #include "ordering-tools.hpp"

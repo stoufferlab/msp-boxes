@@ -1,14 +1,13 @@
 
 // c++ header files
-#include <fstream>
-#include <iostream>
-#include <string>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <vector>
 #include <ctime>
-#include <map>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
 
 // my header files
 #include "ordering-tools.hpp"

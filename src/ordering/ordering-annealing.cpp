@@ -2,22 +2,20 @@
 #define _ordering_annealing_cpp_included_
 
 // c++ header files
-#include <fstream>
-#include <iostream>
-#include <string>
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <vector>
 #include <ctime>
-// #include <cpgplot.h>
-#include <map>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
 
 // my header files
 #include "ordering-annealing.hpp"
 #include "ordering-io.hpp"
 #include "ordering-tools.hpp"
-#include "ordering-templated.hpp"
 
 // namespaces
 using namespace std;
@@ -124,8 +122,7 @@ int MakeChangeVectors(const vector <int>& order, vector<int>& change,
   }
 
   for( i=0; i<n; i++){
-    in = Find( i, change );
-    if( in == -1 ){
+    if(find(change.begin(),change.end(),i) == change.end()){
       nochange.push_back(i);
     }
   }
@@ -476,17 +473,16 @@ void ExhaustiveIter(vector<double>& matrix,int n,
                     double& energy,
                     const vector<int>& kline,int nblocks){
 
-   int step,nsteps=kline.size();
-   double deltaen;
-   int line;
+  int step,nsteps=kline.size();
+  double deltaen;
+  int line;
 
-   for(step=0;step<nsteps;step++){
-     ///we try to change the kernel originally at position 0, line is ist current position
-     line =  Find(step, order);
-     deltaen = ExhaustiveStep( matrix, n, order, kline, line, nblocks);
-     energy+=deltaen;
-   }
-
+  for(step=0;step<nsteps;step++){
+    ///we try to change the kernel originally at position 0, line is ist current position
+    line = find(order.begin(),order.end(),step) - order.begin();
+    deltaen = ExhaustiveStep( matrix, n, order, kline, line, nblocks);
+    energy+=deltaen;
+  }
 }
 
 

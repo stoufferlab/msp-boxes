@@ -2,7 +2,6 @@
 #define _ordering_tools_hpp_included_
 
 // c++ header files
-#include <map>
 #include <vector>
 
 // my header files
@@ -44,12 +43,6 @@ double ranf();
 double ran1f();
 
 double gauss(double variance);
-
-template <class T>
-void Swap(T& a,T& b);
-
-template <class T>
-int Find(T n, vector<T> nlist);
 
 vector <int> RandomizeOrder(int n, int nblocks);
 bool fileExists(const char* fileName);

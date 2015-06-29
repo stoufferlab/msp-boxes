@@ -2,21 +2,19 @@
 #define _ordering_io_cpp_included_
 
 // c++ header files
-#include <fstream>
-#include <iostream>
-#include <string>
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <vector>
 #include <ctime>
-// #include <cpgplot.h>
-#include <map>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
 
 // my header files
 #include "ordering-io.hpp"
 #include "ordering-tools.hpp"
-#include "ordering-templated.hpp"
 
 // namespaces
 using namespace std;
@@ -34,7 +32,7 @@ vector<int> OrderVector(int l1,int l2,int w,int n){
 
   for(i=0;i<w;i++){
 
-    Swap( ordvec[ l1 + i ], ordvec[ l2 + i ]);
+    swap( ordvec[ l1 + i ], ordvec[ l2 + i ]);
 
   }
 
@@ -119,7 +117,7 @@ vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
   int k;
   for (i=0;i<nn; i++){
 //     cout<<i<<" "<<nn<<endl;
-    if (Find(i, assignedNodes) ==-1){
+    if(find(assignedNodes.begin(),assignedNodes.end(),i) == assignedNodes.end()){
       knodelist.push_back(nodeCount);
       kkline.push_back(nodeCount);
       kernelOrder.push_back(kernelCount);
@@ -205,20 +203,14 @@ void ReadMatrix(const int format, const char *fileName,
     int ii [2];
     
     // determine how many species there are
-    count = 0;
+    transtableTemp.clear();
     while(gin>>ii[0]>>ii[1]>>x){
       
-      i = Find(ii[0], transtableTemp);
-      if( i == -1){
-	i = count;
-	transtableTemp.push_back(ii[0]);
-	count ++;
+      if(find(transtableTemp.begin(),transtableTemp.end(),ii[0]) == transtableTemp.end()){
+        transtableTemp.push_back(ii[0]);
       }
-      j = Find(ii[1], transtableTemp);
-      if( j == -1){
-	j = count;
-	transtableTemp.push_back(ii[1]);
-	count ++;
+      if(find(transtableTemp.begin(),transtableTemp.end(),ii[1]) == transtableTemp.end()){
+        transtableTemp.push_back(ii[1]);
       }
     }
     gin.close();
@@ -228,12 +220,12 @@ void ReadMatrix(const int format, const char *fileName,
     sim.clear();
     for(i=0;i<n;i++)
       for(j=0;j<n;j++)
-	sim.push_back(0);
+        sim.push_back(0);
     
     gin.open(fileName);
     while(gin>>ii[0]>>ii[1]>>x){
-      i = Find(ii[0], transtableTemp);
-      j = Find(ii[1], transtableTemp);
+      i = find(transtableTemp.begin(),transtableTemp.end(),ii[0]) - transtableTemp.begin();
+      j = find(transtableTemp.begin(),transtableTemp.end(),ii[1]) - transtableTemp.begin();
 
       sim[ i + n * j ] = x;
     }
@@ -247,7 +239,7 @@ void ReadMatrix(const int format, const char *fileName,
     // determine how many species there are
     while(gin.get(c)){
       if(c == '\n')
-	++count;
+        ++count;
     }
     gin.close();
     
@@ -258,17 +250,14 @@ void ReadMatrix(const int format, const char *fileName,
     for(i=0;i<n;i++){
       transtableTemp.push_back(i);
       for(j=0;j<n;j++)
-	sim.push_back(0);
+        sim.push_back(0);
     }
 
     gin.open(fileName);
     for( i=0; i<n; i++ ){
-      
       for( j=0; j<n; j++){
-	
-	gin >> x;
-	 sim[ i + n * j ] = x;
-	 
+        gin >> x;
+        sim[ i + n * j ] = x;
       }
     }
 
