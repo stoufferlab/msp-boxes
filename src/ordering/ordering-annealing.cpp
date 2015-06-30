@@ -86,11 +86,16 @@ int MakeChangeVectors(const vector <int>& order,
   int i,in,in2,j,jmax, nk = klines.size();
   vector<bool> changed(n,false);
   
+  change.clear();
   change.reserve(n);
-  for(i=0; i<width; i++){
-    in = order[line1+i];
-    jmax = n - klines[in];
-    if(in != nk-1) jmax = klines[in+1] - klines[in];
+
+  for(i=line1; i<line1+width; i++){
+    in = order[i];
+    
+    if(in != nk-1)
+      jmax = klines[in+1] - klines[in];
+    else
+      jmax = n - klines[in];  
 
     for(j=0;j<jmax;j++){
       change.push_back( klines[in] + j );
@@ -101,13 +106,15 @@ int MakeChangeVectors(const vector <int>& order,
     
   if(line1<line2){
 
-    for( i=line1+width; i<line2+width; i++){
-
+    for(i=line1+width; i<line2+width; i++){
       in = order[i];
-      jmax = n-klines[in];
-      if( in != nk-1 ) jmax = klines[in+1] - klines[in];
+      
+      if(in != nk-1)
+        jmax = klines[in+1] - klines[in];
+      else
+        jmax = n-klines[in];
 
-      for( j=0; j<jmax; j++){
+      for(j=0; j<jmax; j++){
         change.push_back( klines[in] + j );
         changed[klines[in]+j] = true;
       }
@@ -118,13 +125,15 @@ int MakeChangeVectors(const vector <int>& order,
 
   if( line1 > line2 ){
 
-    for( i=line2; i<line1; i++){
-
+    for(i=line2; i<line1; i++){
       in = order[i];
-      jmax = n - klines[in];
-      if( in != nk-1 ) jmax = klines[in+1] - klines[in];
       
-      for( j=0; j<jmax; j++){
+      if(in != nk-1)
+        jmax = klines[in+1] - klines[in];
+      else
+        jmax = n - klines[in];
+      
+      for(j=0; j<jmax; j++){
         change.push_back( klines[in] + j );
         changed[klines[in]+j] = true;
       }
@@ -133,8 +142,9 @@ int MakeChangeVectors(const vector <int>& order,
 
   }
 
+  nochange.clear();
   nochange.reserve(n-change.size());
-  for(i=0;i<n; i++){
+  for(i=0;i<n;i++){
     if(!changed[i]){
       nochange.push_back(i);
     }

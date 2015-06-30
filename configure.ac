@@ -20,7 +20,7 @@ AC_PROG_CXX
 # Add a few extra compilation goodies
 #AX_CHECK_ENABLE_DEBUG()
 #AX_CXXFLAGS_WARN_ALL
-AC_SUBST(CXXFLAGS,"--pedantic -fPIC -Wall -Wextra -O3")
+AC_SUBST(CXXFLAGS,"-g --pedantic -Wall -Wextra -O3")
 
 # Checks for library functions.
 AC_FUNC_STRTOD
