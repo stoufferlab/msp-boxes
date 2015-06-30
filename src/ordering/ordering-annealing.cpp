@@ -32,103 +32,90 @@ the block is selected so that at low temperature is of size one.
 
 int ChangeSegmentOrder(vector<int>& order, int line1, int line2, int width){
 
-  int i, in, in2, j;
-  vector<int> pos;
+  unsigned int i, j;
+  vector<int> pos(width);
   
   for(i=0;i<width;i++){
-
-    pos.push_back( order[line1+i] );
-
+    pos[i] = order[line1+i];
   }
 
-  if( line1 < line2 ){
-
+  if(line1 < line2){
     j=0;
-
     for( i=line1+width; i<line2+width; i++){
-
       order[ line1 + j ] = order[i];
       j++;
-
     }
     for(i=0;i<width;i++)
       order[ line2 + i ] = pos[i];
-    
-  }
+  }else
+    if( line1 > line2 ){
+      for( i=line1-1; i>=line2; i--){
+        order[ i + width ] = order[i];
+      }
 
-  if( line1 > line2 ){
-    
-    for( i=line1-1; i>=line2; i--){
-
-      order[ i + width ] = order[i];
-      
+      for( i=0; i<width; i++)
+        order[ line2 + i ] = pos[i];
     }
-
-    for( i=0; i<width; i++)
-      order[ line2 + i ] = pos[i];
-
-  }
 
   return 1;
 }      
 
 /****************************************************************/
 
-int MakeChangeVectors(const vector <int>& order, vector<int>& change, 
-		                  vector<int>& nochange, int line1, int line2, 
-		                  int width, int n, const vector<int>& klines){
+int MakeChangeVectors(const vector <int>& order,
+                      vector<bool>& change,
+                      int line1,
+                      int line2, 
+		                  int width,
+                      int n,
+                      const vector<int>& klines){
 
-  int i,in,in2,j,jmax, nk = klines.size();
+  int i,in,j,jmax, nk = klines.size();
   vector<int> pos;
   
   for(i=0; i<width; i++){
     in = order[line1+i];
     jmax = n - klines[in];
-    if(in != nk-1) jmax = klines[in+1] - klines[in];
+    
+    if(in != nk-1)
+      jmax = klines[in+1] - klines[in];
 
     for(j=0;j<jmax;j++)
-      change.push_back( klines[in] + j );
-
+      change[klines[in] + j] = true;
   }
     
   if(line1<line2){
-
-    for( i=line1+width; i<line2+width; i++){
-
+    for(i=line1+width; i<line2+width; i++){
       in = order[i];
       jmax = n-klines[in];
-      if( in != nk-1 ) jmax = klines[in+1] - klines[in];
-
-      for( j=0; j<jmax; j++)
-	change.push_back( klines[in] + j );
-
-    }
-
-  }
-
-  if( line1 > line2 ){
-
-    for( i=line2; i<line1; i++){
-
-      in = order[i];
-      jmax = n - klines[in];
-      if( in != nk-1 ) jmax = klines[in+1] - klines[in];
       
-      for( j=0; j<jmax; j++)
-	change.push_back( klines[in] + j );
+      if( in != nk-1 )
+        jmax = klines[in+1] - klines[in];
 
+      for( j=0; j<jmax; j++)
+        change[klines[in] + j] = true;
+    }
+  }else
+    if(line1 > line2){
+      for( i=line2; i<line1; i++){
+        in = order[i];
+        jmax = n - klines[in];
+
+        if( in != nk-1 )
+          jmax = klines[in+1] - klines[in];
+      
+        for(j=0; j<jmax; j++)
+          change[klines[in] + j] = true;
+      }
     }
 
-  }
-
-  for( i=0; i<n; i++){
+  /*for(i=0; i<n; i++){
     if(find(change.begin(),change.end(),i) == change.end()){
       nochange.push_back(i);
     }
-  }
+  }*/
 
   return 1;
-
 }      
 
 /*************************************************************/
@@ -158,71 +145,54 @@ double ComputeEnergy(const vector<double>& mat, int netSize, const vector<int>& 
 /*****************************************************************/
 /*****************************************************************/
 
-double EnergyChangeReOrd(const vector<double>& mat,int l1,int l2,int w,int n, 
+double EnergyChangeReOrd(const vector<double>& mat,
+                         int l1,
+                         int l2,
+                         int w,
+                         int n, 
 			                   const vector<int>& kernelOrder,
                          const vector<int>& klines){
 
   double deltaen = 0;
-  int i,j;
-  int k1,k2;
-  vector<int> lchange,lfix;
-         //make two vectors, one with the rows that
-			   //change position and one with the rows
-			   //that keep the same position
-
-  MakeChangeVectors( kernelOrder, lchange, lfix, l1, l2, w, n, klines);
-                 //original
-							   //matrix
-							   //lines
-							   //that
-							   //change or
-							   //not
-  vector<int> oldorder,neworder,newKernelOrder=kernelOrder;
-
-  oldorder=GetNodeOrder(kernelOrder,klines,n,0);//given a matrix line, it tells
-				      //me the position of the nodes in the
-				      //"virtual" ordered matrix
-//    neworder=oldorder;
-  int line1,line2,width;
-   
+  unsigned int i,j;
   
+  // figure out what the new order would be
+  vector<int> newKernelOrder(kernelOrder);
   ChangeSegmentOrder(newKernelOrder,l1,l2,w);
 
-  neworder=GetNodeOrder(newKernelOrder,klines,n,0);//given a matrix line, it tells me
-				    //the position of the nodes in the "virtual"
-				    //ordered matrix
+  if(newKernelOrder != kernelOrder){
+    //make a vector that is true for the rows that change position and false for the rows that don't
+    vector<bool> lchange(n,false);
+    MakeChangeVectors(kernelOrder, lchange, l1, l2, w, n, klines);
+
+    //given a matrix line, it tells me the position of the nodes in the
+    //"virtual" ordered matrix
+    vector<int> oldorder = GetNodeOrder(kernelOrder,klines,n,0);
+    vector<int> neworder = GetNodeOrder(newKernelOrder,klines,n,0);
   
-  for(i=0;i<lchange.size();i++)
-    for(j=0;j<lfix.size();j++){
-      
-      line1=lchange[i];
-      line2=lfix[j];
-      deltaen+=2.*mat[line1+line2*n]
-	*(double)(abs(neworder[line1]-neworder[line2])
-		 -abs(oldorder[line1]-oldorder[line2]))/(double)(n);
-      
-    }
-
-    for(i=0;i<lchange.size()-1;i++)
+    // compute the change in energy between the changed lines and fixed lines
+    for(i=0;i<lchange.size();i++){
       for(j=i+1;j<lchange.size();j++){
-
-	line2=lchange[j];
-	line1=lchange[i];
-	deltaen+=2.*mat[line1+line2*n]*
-	  (double)(abs(neworder[line1]-neworder[line2])
-		  -abs(oldorder[line1]-oldorder[line2]))/(double)(n);
-	
+        if(lchange[i] || lchange[j]){
+          deltaen+=mat[i+j*n]*(double)(abs(neworder[i]-neworder[j])-abs(oldorder[i]-oldorder[j]));
+        }
       }
-
+    }
+  
+    // add the appropriate scaling
+    deltaen = 2*deltaen/double(n);
+  }
+  
   return deltaen;
-      
 }
 
 /**************************************************************/
 
 double AnnealStep(double temperature,
-                  const vector<double>& matrix, int netSize,
-		              vector <int>& order,int nblocks,
+                  const vector<double>& matrix,
+                  int netSize,
+		              vector <int>& order,
+                  int nblocks,
                   const vector<int>& klines)
   //Only reordering matrix rordering matrix
 {
@@ -277,7 +247,7 @@ double AnnealStep(double temperature,
   line2 -= (line2%nblocks);
 
 
-  deltaE = EnergyChangeReOrd( matrix, line1, line2, width, netSize, order, klines);
+  deltaE = EnergyChangeReOrd(matrix, line1, line2, width, netSize, order, klines);
  
   double prob;
 
@@ -300,7 +270,8 @@ double AnnealStep(double temperature,
 // This is in order to get a good starting temperature
 //
 double AnnealStepFree(double temperature,
-                      const vector<double>& matrix, int netSize,
+                      const vector<double>& matrix,
+                      int netSize,
 		                  vector<int>& order,int nblocks,
                       const vector<int>& klines)
   //Only reordering matrix rordering matrix
@@ -356,7 +327,7 @@ double AnnealStepFree(double temperature,
   line2 -= (line2%nblocks);
 
 
-  deltaE = EnergyChangeReOrd( matrix, line1, line2, width, netSize, order, klines);
+  deltaE = EnergyChangeReOrd(matrix, line1, line2, width, netSize, order, klines);
  
   ChangeSegmentOrder( order, line1, line2, width);
   return deltaE;
@@ -373,7 +344,7 @@ void AnnealIter(double temperature,
                 vector<int>& order,double& energy,double& minenergy,int nblocks, 
 		            const vector<int>& kline){
   
-  int step,i1,ii1;
+  int step;
   double deltaen;
 
   for( step=0; step<nsteps; step++ ){
@@ -394,23 +365,22 @@ void AnnealIter(double temperature,
 
 void InitialTemp(double& temperature,
             		 const vector<double>& matrix,
-                 const vector<int>& translationTable,
-		             const vector<vector<int> >& kernels,
-                 int nsteps,int n,
-                 vector<int>& order,
+                 int nsteps,
+                 int n,
+                 const vector<int>& order,
                  int nblocks,
                  const vector<int>& kline){
   
-  int step;
+  unsigned int i,step;
   double deltaen;
   double initialProbability = 0.95;
-  int i;
+  vector<int> neworder(order);
 
-  temperature = ComputeEnergy(matrix, n, order, kline);
+  temperature = ComputeEnergy(matrix, n, neworder, kline);
   for(i=0;i<20;i++){
     deltaen = 0;
     for( step=0; step<nsteps; step++ ){
-        deltaen += fabs(AnnealStepFree(temperature, matrix, n, order, nblocks, kline));
+        deltaen += fabs(AnnealStepFree(temperature, matrix, n, neworder, nblocks, kline));
     }
 
     deltaen /= double(nsteps);
@@ -434,31 +404,24 @@ double ExhaustiveStep(vector<double>& matrix,int n,
 
   line1=row;
 
-  cout<<"Iterating \n"<<endl;
+  //cout<<"Iterating \n"<<endl;
   for (width = nblocks; width>0 ; width--){
-
-    if( line1+width < nk ){
-
+    if(line1+width < nk){
       for (line2=0;line2<= nk-width;line2++){
+        if(line2<line1 || line2 >= line1+width){
+          deltaE = EnergyChangeReOrd(matrix, line1, line2, width, n, order, klines);
 
-	if(line2<line1 || line2 >= line1+width){
-      
-	  deltaE = EnergyChangeReOrd
-	    ( matrix, line1, line2, width, n, order, klines);
-	  
-	  if(deltaE<maxdeltaE){
-
-	    maxdeltaE = deltaE;
-	    line = line2;
-	    wl = width;
-
-	  }
-	}
+          if(deltaE<maxdeltaE){
+            maxdeltaE = deltaE;
+            line = line2;
+            wl = width;
+          }
+        }
       }
     }
   }
       
-  if (line !=-1){
+  if(line !=-1){
     ChangeSegmentOrder(order,line1,line,wl);
     return maxdeltaE;
   }
@@ -484,7 +447,5 @@ void ExhaustiveIter(vector<double>& matrix,int n,
     energy+=deltaen;
   }
 }
-
-
 
 #endif

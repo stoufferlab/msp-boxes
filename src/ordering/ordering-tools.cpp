@@ -64,7 +64,7 @@ void ORDERINGTOOLS::OptionParser(int argc,
 				 unsigned long &randomSeed,
 				 unsigned int &restart){
   
-  filename = " ";
+  filename = (char *)" ";
   temperature = -1;
   factor = 0.95;
   randomization = 0;
@@ -103,7 +103,7 @@ void ORDERINGTOOLS::OptionParser(int argc,
     temperature = -1;
     randomization = 0;
   }else{
-    if(!restart && filename == " "){
+    if(!restart && strcmp(filename," ")==0){
       cout << "You must specify an input filename (with -f) or to restart (with -R)\n";
       cout << "Try --help for more information.\n";
       exit(1);
@@ -144,15 +144,15 @@ void ORDERINGTOOLS::ExhaustiveHelp(){
 }
 
 void ORDERINGTOOLS::OptionParserExhaustive(int argc,
-					   char *argv[],
+					   char* argv[],
 					   char* &filename,
 					   char* &translationFilename,
 					   unsigned int &format,
 					   unsigned int &nblocks,
 					   unsigned int &restart){
 
-  filename = " ";
-  translationFilename = " ";
+  filename = (char *)" ";
+  translationFilename = (char *)" ";
   format = 1;
   nblocks = 1;
   restart = 0;
@@ -179,18 +179,18 @@ void ORDERINGTOOLS::OptionParserExhaustive(int argc,
   }
 
   if(restart){
-    if(filename != " " || translationFilename != " "){
-      if(filename != " ")
-	cout << "You cannot specify restart (-R) and an input filename (-f)\n";
-      if(translationFilename != " ")
-	cout << "You cannot specify restart (-R) and an input translation filename (-t)\n";
+    if(strcmp(filename," ") != 0 || strcmp(translationFilename," ") != 0){
+      if(strcmp(filename, " ") != 0)
+        cout << "You cannot specify restart (-R) and an input filename (-f)\n";
+      if(strcmp(translationFilename," ") != 0)
+        cout << "You cannot specify restart (-R) and an input translation filename (-t)\n";
       cout << "Try --help for more information.\n";
       exit(1);
   }else{
-      if(!restart && filename == " "){
-	cout << "You must specify an input filename (with -f) or to restart (with -R)\n";
-	cout << "Try --help for more information.\n";
-	exit(1);
+      if(!restart && strcmp(filename, " ")==0){
+        cout << "You must specify an input filename (with -f) or to restart (with -R)\n";
+        cout << "Try --help for more information.\n";
+        exit(1);
       }
     }
   }
@@ -230,13 +230,14 @@ double gauss(double variance){
 }
 
 // return a randomized ordering of kernels
-vector <int> RandomizeOrder(int n, int nblocks){
+vector <int> RandomizeOrder(unsigned int n, unsigned int nblocks){
 
   vector<int> order, ord(n);
-  int i, j, k=0;
+  unsigned int i, j, k=0;
 
   cout<<"Randomizing order\n";
 
+  order.reserve(n);
   while( order.size() < n ){
 
     i = (int)(n*ran1f());
@@ -251,10 +252,9 @@ vector <int> RandomizeOrder(int n, int nblocks){
       order.push_back( i + j );
       ord[ i + j ] = k;
       k ++;
-//       cout<<"a "<<i+j<<" "<<order[i+j]<<endl;
     }
-   
   }
+
   return ord;
 }
 

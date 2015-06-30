@@ -45,18 +45,17 @@ int main(int argc, char** argv)  {
   vector<vector<int> > kernels;
   unsigned int netSize = translationTable.size();
   int nkernels=netSize;
-  kernels = 
-    GetKernels( similarityMatrix, kernelOrder, klines, nkernels, translationTable);
+  kernels = GetKernels(similarityMatrix, kernelOrder, klines, nkernels, translationTable);
   
   cout<<"Reduced matrix size "<<nkernels<<endl;
   cout<<"Reduced matrix size "<<kernelOrder.size()<<endl;
   cout<<"Reduced matrix size "<<klines.size()<<endl;
 
-  energy = ComputeEnergy( similarityMatrix, netSize, kernelOrder, klines);
+  energy = ComputeEnergy(similarityMatrix, netSize, kernelOrder, klines);
   cout.precision(16);
   cout<<"e: "<<energy<<endl;
 
-  ExhaustiveIter( similarityMatrix, netSize, kernelOrder, energy, klines, nblocks);
+  ExhaustiveIter(similarityMatrix, netSize, kernelOrder, energy, klines, nblocks);
   cout<<"After exhaustive "<<energy<<endl;
    
   PrintMatrix( "coclas-exhaustive.dat", similarityMatrix, kernelOrder, klines, netSize, 0);

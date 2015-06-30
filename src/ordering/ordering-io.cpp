@@ -22,7 +22,7 @@ using namespace std;
 
 //********************************************///
 
-vector<int> OrderVector(int l1,int l2,int w,int n){
+/*vector<int> OrderVector(int l1,int l2,int w,int n){
 
   int i;
   vector<int> ordvec(n);
@@ -38,58 +38,58 @@ vector<int> OrderVector(int l1,int l2,int w,int n){
 
   return ordvec;
 
-}
+}*/
 
 
 /****************************************************************/
 
  vector<int> GetNodeOrder(const vector<int>& kernelOrder,
                           const vector<int>& klines,
-			   int netSize, int option){
+                          int netSize,
+                          int option){
    //kernelOrder is kernel order
    //netSize is total number of nodes <= KernelOrder.size()
    //option:
    //0: means  nodeOrder[originalposition]=currentposition
    //1: means nodeOrder[currentposition]=originalposition
 
-   int i,j,k,jmax;
+   unsigned int i,j,k,jmax;
    vector<int> nodeOrder(netSize);
 
    switch(option){
+    case 0:
 
-   case 0:
+      k=0;
+      for(i=0;i<kernelOrder.size();i++){
+        if(kernelOrder[i]<kernelOrder.size()-1)
+          jmax=klines[kernelOrder[i]+1]-klines[kernelOrder[i]];
+        else
+          jmax=netSize-klines[kernelOrder[i]];
+        
+        for(j=0;j<jmax;j++){
+          nodeOrder[klines[kernelOrder[i]]+j]=k;
+          k++;
+        }
+      }
 
-     k=0;
-     for(i=0;i<kernelOrder.size();i++){
-       
-       jmax=netSize-klines[kernelOrder[i]];
-       if(kernelOrder[i]!=kernelOrder.size()-1) 
-	 jmax=klines[kernelOrder[i]+1]-klines[kernelOrder[i]];
-       
-       for(j=0;j<jmax;j++){
-	 nodeOrder[klines[kernelOrder[i]]+j]=k;
- 	 k++;
-       }
-       
-     }
+      break;
+   
+    case 1:
 
-     break;
-   case 1:
+      k=0;
+      for(i=0;i<kernelOrder.size();i++){
+        if(kernelOrder[i]<kernelOrder.size()-1)
+          jmax=klines[kernelOrder[i]+1]-klines[kernelOrder[i]];
+        else
+          jmax=netSize-klines[kernelOrder[i]];
 
-     k=0;
+        for(j=0;j<jmax;j++){
+          nodeOrder[k]=klines[kernelOrder[i]]+j;
+          k++;
+        }
+      }
 
-     for(i=0;i<kernelOrder.size();i++){
-       jmax=netSize-klines[kernelOrder[i]];
-
-       if(kernelOrder[i]!=kernelOrder.size()-1) 
-	 jmax=klines[kernelOrder[i]+1]-klines[kernelOrder[i]];
-       for(j=0;j<jmax;j++){
-	 nodeOrder[k]=klines[kernelOrder[i]]+j;
-
-	 k++;
-       }
-       
-     }
+      break;
    }
 
    return nodeOrder;
@@ -98,11 +98,12 @@ vector<int> OrderVector(int l1,int l2,int w,int n){
 
 /*********************************************************************/
 
-vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
-				  vector<int>& originalOrder,
-				  vector <int>& klines, int& n,
-				  vector<int>& translationTable ){
-  int nn=n,i,j;
+vector< vector<int> > GetKernels(vector<double>& similarityMatrix,
+                                 vector<int>& originalOrder,
+                                 vector <int>& klines,
+                                 int& n,
+                                 vector<int>& translationTable){
+  unsigned int i,j,nn=n;
   vector<int> kernelsize,knodelist;
   vector<vector<int> > kernelList;//list of nodes inside each kernel
   vector<int> kernelOrder;//order of the kernels
@@ -112,11 +113,11 @@ vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
   vector<int> translationTableNew(nn);//and update translation table to new order
 
   int kernelCount, nodeCount;
-  nodeCount =0;
-  kernelCount =0;
-  int k;
-  for (i=0;i<nn; i++){
-//     cout<<i<<" "<<nn<<endl;
+  nodeCount=0;
+  kernelCount=0;
+
+  for(i=0;i<nn;i++){
+    knodelist.clear();
     if(find(assignedNodes.begin(),assignedNodes.end(),i) == assignedNodes.end()){
       knodelist.push_back(nodeCount);
       kkline.push_back(nodeCount);
@@ -124,35 +125,29 @@ vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
       assignedNodes.push_back(i);
       translationTableNew[nodeCount]=  translationTable[i];	
       nodeCount ++;
-      for( j= i + 1; j < nn; j++){
-
-	if(similarityMatrix[ i + j*nn ] == 1.){
-	  knodelist.push_back(nodeCount);
-	  assignedNodes.push_back(j);
-	  translationTableNew[nodeCount] = translationTable[j];	
-	  nodeCount ++;
-	  
-	}
+      for(j=i+1;j<nn;j++){
+        if(similarityMatrix[ i + j*nn ] == 1.){
+          knodelist.push_back(nodeCount);
+          assignedNodes.push_back(j);
+          translationTableNew[nodeCount] = translationTable[j];
+          nodeCount ++;
+        }
       }
       kernelCount++;
       kernelList.push_back( knodelist );
       kernelsize.push_back( knodelist.size() );
-      knodelist.clear();
-
     }
-    
   }
 
-  cout<<"Count "<<nodeCount <<endl;
+  cout<<"Count "<<nodeCount<<endl;
   cout<<assignedNodes.size()<<endl;
-  //Construct new matrix
+  
+  //Construct new similarity matrix
   for (i=0;i<assignedNodes.size();i++){
     for (j=i;j<assignedNodes.size();j++){
-      similarityMatrixNew[i + nn*j]= similarityMatrixNew[j + nn*i] 
-	= similarityMatrix[assignedNodes[i] + nn*assignedNodes[j]];
+      similarityMatrixNew[i + nn*j] = similarityMatrixNew[j + nn*i] = similarityMatrix[assignedNodes[i] + nn*assignedNodes[j]];
     }
   }
-
 
   n = kernelList.size();
   originalOrder = kernelOrder;
@@ -176,7 +171,6 @@ vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
   fout.close();
   fout1.close();
 
-
   cout<<"Total n of nodes "<<count<<endl;
 
   return kernelList;
@@ -185,8 +179,10 @@ vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
 
 /**************************************************************/
 
-void ReadMatrix(const int format, const char *fileName,
-		vector<int>& transTable , vector<double>& sim ) {
+void ReadMatrix(const int format,
+                const char *fileName,
+                vector<int>& transTable,
+                vector<double>& sim){
 
   ifstream gin;
   gin.open(fileName);
@@ -409,8 +405,8 @@ void PrintMatrix (const char* fileName, const vector<double>& sim, const vector<
     for(i=0;i<n;i++){
       i1=nodeOrder[i];
       for(j=0;j<n;j++){
-	j1=nodeOrder[j];
-	fo<<sim[i1+j1*n]<<" ";
+        j1=nodeOrder[j];
+        fo<<sim[i1+j1*n]<<" ";
       }
       fo<<endl;
     }
@@ -420,10 +416,9 @@ void PrintMatrix (const char* fileName, const vector<double>& sim, const vector<
     
     for(i=0;i<n;i++){
       i1=nodeOrder[i];
-     
       for(j=0;j<n;j++){
-	j1=nodeOrder[j];
-	fo<<i <<" "<<j<<" "<<sim[i1+j1*n]<<endl;
+        j1=nodeOrder[j];
+        fo<<i <<" "<<j<<" "<<sim[i1+j1*n]<<endl;
       }
    
     }

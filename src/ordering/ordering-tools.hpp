@@ -44,7 +44,7 @@ double ran1f();
 
 double gauss(double variance);
 
-vector <int> RandomizeOrder(int n, int nblocks);
+vector <int> RandomizeOrder(unsigned int n, unsigned int nblocks);
 bool fileExists(const char* fileName);
 
 #endif

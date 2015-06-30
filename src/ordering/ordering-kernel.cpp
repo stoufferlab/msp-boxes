@@ -56,10 +56,10 @@ int main(int argc, char** argv)  {
   vector<int> translationTable;
   vector<int> kernelOrder,klines;
 
-  int i,j,i1,j1;
+  //int i,j,i1,j1;
   unsigned int iter=0;
   double energy,energyold,minenergy=-1;
-  double x;
+  //double x;
   int nblocks = 1;
 
   ofstream fout;
@@ -103,7 +103,7 @@ int main(int argc, char** argv)  {
 
   // if the temperature has not been specified in some manner, estimate a good starting point
   if(temperature == -1){
-    InitialTemp(temperature, similarityMatrix, translationTable, kernels, 50, netSize, kernelOrder, nblocks, klines);
+    InitialTemp(temperature, similarityMatrix, 50, netSize, kernelOrder, nblocks, klines);
   }
 
   if (nkernels>2){
