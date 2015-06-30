@@ -24,8 +24,7 @@ vector<int> GetNodeOrder(const vector<int>& kernelOrder, const vector<int>& klin
 
 vector< vector<int> > GetKernels(vector<double>& similarityMatrix,
 				  				 vector<int>& originalOrder,
-				  				 vector <int>& klines,
-				  				 int& n,
+				  				 vector <int>& klines, int& n,
 				  				 vector<int>& translationTable );
 
 void ReadMatrix(const int format, const char* fileName,
