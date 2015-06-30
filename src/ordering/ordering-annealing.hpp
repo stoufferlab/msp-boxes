@@ -23,9 +23,14 @@ using namespace std;
 
 int ChangeSegmentOrder(vector<int>& order, int line1, int line2, int width);
 
-int MakeChangeVectors(const vector<int>& order, vector<int>& change, 
-		      vector<int>& nochange, int line1, int line2, 
-		      int width, int n, const vector<int>& klines);
+int MakeChangeVectors(const vector<int>& order,
+					  vector<int>& change,
+					  vector<int>& nochange,
+					  int line1,
+					  int line2,
+					  int width,
+					  int n,
+					  const vector<int>& klines);
 
 double ComputeEnergy(const vector<double>& matrix, int netSize, const vector<int>& kernelOrder,
 		         	 const vector<int>& klines);

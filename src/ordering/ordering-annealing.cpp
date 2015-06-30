@@ -74,20 +74,28 @@ int ChangeSegmentOrder(vector<int>& order, int line1, int line2, int width){
 
 /****************************************************************/
 
-int MakeChangeVectors(const vector <int>& order, vector<int>& change, 
-		                  vector<int>& nochange, int line1, int line2, 
-		                  int width, int n, const vector<int>& klines){
+int MakeChangeVectors(const vector <int>& order,
+                      vector<int>& change,
+                      vector<int>& nochange,
+                      int line1,
+                      int line2,
+                      int width,
+                      int n,
+                      const vector<int>& klines){
 
   int i,in,in2,j,jmax, nk = klines.size();
-  vector<int> pos;
+  vector<bool> changed(n,false);
   
+  change.reserve(n);
   for(i=0; i<width; i++){
     in = order[line1+i];
     jmax = n - klines[in];
     if(in != nk-1) jmax = klines[in+1] - klines[in];
 
-    for(j=0;j<jmax;j++)
+    for(j=0;j<jmax;j++){
       change.push_back( klines[in] + j );
+      changed[klines[in]+j] = true;
+    }
 
   }
     
@@ -99,8 +107,10 @@ int MakeChangeVectors(const vector <int>& order, vector<int>& change,
       jmax = n-klines[in];
       if( in != nk-1 ) jmax = klines[in+1] - klines[in];
 
-      for( j=0; j<jmax; j++)
-	change.push_back( klines[in] + j );
+      for( j=0; j<jmax; j++){
+        change.push_back( klines[in] + j );
+        changed[klines[in]+j] = true;
+      }
 
     }
 
@@ -114,15 +124,18 @@ int MakeChangeVectors(const vector <int>& order, vector<int>& change,
       jmax = n - klines[in];
       if( in != nk-1 ) jmax = klines[in+1] - klines[in];
       
-      for( j=0; j<jmax; j++)
-	change.push_back( klines[in] + j );
+      for( j=0; j<jmax; j++){
+        change.push_back( klines[in] + j );
+        changed[klines[in]+j] = true;
+      }
 
     }
 
   }
 
-  for( i=0; i<n; i++){
-    if(find(change.begin(),change.end(),i) == change.end()){
+  nochange.reserve(n-change.size());
+  for(i=0;i<n; i++){
+    if(!changed[i]){
       nochange.push_back(i);
     }
   }
