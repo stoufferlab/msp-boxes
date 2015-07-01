@@ -150,11 +150,9 @@ vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
   //Construct new matrix
   for (i=0;i<assignedNodes.size();i++){
     for (j=i;j<assignedNodes.size();j++){
-      similarityMatrixNew[i + nn*j]= similarityMatrixNew[j + nn*i] 
-	= similarityMatrix[assignedNodes[i] + nn*assignedNodes[j]];
+      similarityMatrixNew[i + nn*j] = similarityMatrixNew[j + nn*i] = similarityMatrix[assignedNodes[i] + nn*assignedNodes[j]];
     }
   }
-
 
   n = kernelList.size();
   originalOrder = kernelOrder;
@@ -177,7 +175,6 @@ vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
   
   fout.close();
   fout1.close();
-
 
   cout<<"Total n of nodes "<<count<<endl;
 
