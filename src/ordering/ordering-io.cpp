@@ -43,58 +43,60 @@ vector<int> OrderVector(int l1,int l2,int w,int n){
 
 /****************************************************************/
 
- vector<int> GetNodeOrder(const vector<int>& kernelOrder,
-                          const vector<int>& klines,
-			   int netSize, int option){
+vector<int> GetNodeOrder(const vector<int>& kernelOrder,
+                         const vector<int>& klines,
+                         int netSize,
+                         int option){
    //kernelOrder is kernel order
    //netSize is total number of nodes <= KernelOrder.size()
    //option:
    //0: means  nodeOrder[originalposition]=currentposition
    //1: means nodeOrder[currentposition]=originalposition
 
-   int i,j,k,jmax;
-   vector<int> nodeOrder(netSize);
+  int i,j,k,jmax;
+  vector<int> nodeOrder(netSize);
 
-   switch(option){
+  switch(option){
 
-   case 0:
+  case 0:
 
-     k=0;
-     for(i=0;i<kernelOrder.size();i++){
+    k=0;
+    for(i=0;i<kernelOrder.size();i++){
        
-       jmax=netSize-klines[kernelOrder[i]];
-       if(kernelOrder[i]!=kernelOrder.size()-1) 
-	 jmax=klines[kernelOrder[i]+1]-klines[kernelOrder[i]];
+      if(kernelOrder[i]!=kernelOrder.size()-1)
+        jmax=klines[kernelOrder[i]+1]-klines[kernelOrder[i]];
+      else
+        jmax=netSize-klines[kernelOrder[i]];
        
-       for(j=0;j<jmax;j++){
-	 nodeOrder[klines[kernelOrder[i]]+j]=k;
- 	 k++;
-       }
+      for(j=0;j<jmax;j++){
+        nodeOrder[klines[kernelOrder[i]]+j]=k;
+        k++;
+      }
        
-     }
+    }
 
-     break;
-   case 1:
+    break;
+  
+  case 1:
 
-     k=0;
+    k=0;
+    for(i=0;i<kernelOrder.size();i++){
 
-     for(i=0;i<kernelOrder.size();i++){
-       jmax=netSize-klines[kernelOrder[i]];
-
-       if(kernelOrder[i]!=kernelOrder.size()-1) 
-	 jmax=klines[kernelOrder[i]+1]-klines[kernelOrder[i]];
-       for(j=0;j<jmax;j++){
-	 nodeOrder[k]=klines[kernelOrder[i]]+j;
-
-	 k++;
-       }
+      if(kernelOrder[i]!=kernelOrder.size()-1)
+        jmax=klines[kernelOrder[i]+1]-klines[kernelOrder[i]];
+      else
+        jmax=netSize-klines[kernelOrder[i]];
+      
+      for(j=0;j<jmax;j++){
+        nodeOrder[k]=klines[kernelOrder[i]]+j;
+        k++;
+      }
        
-     }
-   }
+    }
+  }
 
-   return nodeOrder;
-
- }
+  return nodeOrder;
+}
 
 /*********************************************************************/
 
