@@ -35,8 +35,14 @@ int MakeChangeVectors(const vector<int>& order,
 double ComputeEnergy(const vector<double>& matrix, int netSize, const vector<int>& kernelOrder,
 		         	 const vector<int>& klines);
 
-double EnergyChangeReOrd(const vector<double>& matrix,int l1,int l2,int w,int n, 
-			 const vector<int>& kernelOrder,const vector<int>& klines);
+double EnergyChangeReOrd(const vector<double>& matrix,
+						 int l1,
+						 int l2,
+						 int w,
+						 int n,
+						 const vector<int>& kernelOrder,
+						 const vector<int>& klines,
+						 vector<int>& newKernelOrder);
 
 double AnnealStep(double temperature, const vector<double>& matrix, int netSize,
 		  		  vector <int>& order,int nblocks, const vector<int>& klines);
@@ -66,14 +72,14 @@ void InitialTemp(double& temperature,
                  int nblocks,
                  const vector<int>& kline);
 
-double ExhaustiveStep(vector<double>& matrix,
+double ExhaustiveStep(const vector<double>& matrix,
 		      		  int n,
 		      		  vector<int>& order,
 		      		  const vector<int>& klines,
 		      		  int row,
 		      		  int nblocks);
   
-void ExhaustiveIter(vector<double>& matrix,
+void ExhaustiveIter(const vector<double>& matrix,
 				    int n,
 				    vector<int>& order,
 				    double& energy,
