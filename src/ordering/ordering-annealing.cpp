@@ -159,6 +159,7 @@ double EnergyChangeReOrd(const vector<double>& mat,int l1,int l2,int w,int n,
   double deltaen = 0;
   unsigned int i,j;
   int line1,line2;
+  int do1, do2, oo1, no1;
 
   // determine what the new order will be
   ChangeSegmentOrder(newKernelOrder,l1,l2,w);
@@ -179,20 +180,21 @@ double EnergyChangeReOrd(const vector<double>& mat,int l1,int l2,int w,int n,
 
     // calculate the change in energy only for pairs that are altered by change    
     for(i=0;i<lchange.size();i++){
+      line1 = lchange[i];
+      oo1 = oldorder[line1];
+      no1 = neworder[line1];
       for(j=0;j<lfix.size();j++){
-        
-        line1=lchange[i];
         line2=lfix[j];
-        deltaen+=mat[line1+line2*n]*(abs(neworder[line1]-neworder[line2])-abs(oldorder[line1]-oldorder[line2]));
-        
+        do1 = abs(oo1-oldorder[line2]);
+        do2 = abs(no1-neworder[line2]);
+        deltaen+=mat[line1+line2*n]*(do2-do1);
       }
 
       for(j=i+1;j<lchange.size();j++){
-
         line2=lchange[j];
-        line1=lchange[i];
-        deltaen+=mat[line1+line2*n]*(abs(neworder[line1]-neworder[line2])-abs(oldorder[line1]-oldorder[line2]));
-  	
+        do1 = abs(oo1-oldorder[line2]);
+        do2 = abs(no1-neworder[line2]);
+        deltaen+=mat[line1+line2*n]*(do2-do1);
       }
     }
 
@@ -209,7 +211,8 @@ double AnnealStep(double temperature,
                   int netSize,
 		              vector <int>& order,
                   int nblocks,
-                  const vector<int>& klines)
+                  const vector<int>& klines,
+                  bool freeStep)
   //Only reordering matrix rordering matrix
 {
   
@@ -265,88 +268,12 @@ double AnnealStep(double temperature,
   vector<int> neworder(order);
   deltaE = EnergyChangeReOrd(matrix, line1, line2, width, netSize, order, klines, neworder);
  
-  double prob;
-
-  prob = exp( -deltaE/temperature );
-
-  if( ranf() < prob ){
-    
+  if(freeStep || ranf() < exp( -deltaE/temperature )){
     order = neworder;
     return deltaE;
-  }	 
-  
+  }
+
   return 0;
-  
-  
-}
-
-// Make an annealing step of reordering the matrix but without
-// worrying about acceptance temperature
-//
-// This is in order to get a good starting temperature
-//
-double AnnealStepFree(double temperature,
-                      const vector<double>& matrix, int netSize,
-		                  vector<int>& order,int nblocks,
-                      const vector<int>& klines)
-  //Only reordering matrix rordering matrix
-{
-  
-  int line1,line2,width, nkernels=klines.size();
-  double deltaE;
-
-//    double energy,energyold;
-//    energyold=energy=ComputeEnergy(*mat, n, *order, klines);
-
-   //1 pick two random numbers (starting line that we are swapping)
-  
-  line1 = line2 = width = 0;
-  
-  //"Computing line and width\n";
-
-  width = (int)( fabs(gauss(sqrt(temperature)*.05*nkernels) ) ) + nblocks;
-//   width = nblocks;
-  width -= (width%nblocks);
-  
-
-  line1 = width/2 + (int)( (nkernels-width)*ran1f() );
-  line1 -= width/2;
-  line1 -= (line1%nblocks);
-  
-  if ( line1 < 0 ) line1 = 0;
-  
-
-  while( width > nkernels-line1 ){
-    
-    width = (int)( fabs( gauss( sqrt(temperature)*.05*nkernels ) ) ) + nblocks;
-    width -= (width%nblocks);
-      
-  }
-
-  line2=(int)(gauss(sqrt(temperature)*.1));
-  
-  
-  if( line2 < 0 ){
-
-    line2 -= line1;
-    if( line2 < 0 ) line2=0;
-    
-  }
-  else{
-    
-    line2 += line1 + width;
-    if ( line2 > nkernels-width ) line2 = nkernels-width;
-    
-  }
-  
-  line2 -= (line2%nblocks);
-
-  vector<int> neworder(order);
-  deltaE = EnergyChangeReOrd( matrix, line1, line2, width, netSize, order, klines, neworder);
- 
-  order = neworder;
-  return deltaE;
-  
 }
 
 /**************************************************************/
@@ -363,7 +290,7 @@ void AnnealIter(double temperature,
   double deltaen;
 
   for( step=0; step<nsteps; step++ ){
-    deltaen = AnnealStep( temperature, matrix, n, order, nblocks, kline);
+    deltaen = AnnealStep(temperature, matrix, n, order, nblocks, kline, false);
     energy += deltaen;
 
     if(energy < minenergy ){
@@ -391,18 +318,20 @@ void InitialTemp(double& temperature,
   double deltaen;
   double initialProbability = 0.95;
   int i;
+  vector<int> itorder(order);
 
-  temperature = ComputeEnergy(matrix, n, order, kline);
+  temperature = ComputeEnergy(matrix, n, itorder, kline);
   for(i=0;i<20;i++){
     deltaen = 0;
     for( step=0; step<nsteps; step++ ){
-        deltaen += fabs(AnnealStepFree(temperature, matrix, n, order, nblocks, kline));
+        deltaen += fabs(AnnealStep(temperature, matrix, n, itorder, nblocks, kline, true));
     }
 
     deltaen /= double(nsteps);
     temperature = deltaen/(-log(initialProbability));
   }
 
+  order = itorder;
 }
 
 /*****************************************************************/
@@ -421,7 +350,7 @@ double ExhaustiveStep(const vector<double>& matrix,int n,
 
   line1=row;
 
-  cout<<"Iterating \n"<<endl;
+  //cout<<"Iterating \n"<<endl;
   for (width = nblocks; width>0 ; width--){
 
     if( line1+width < nk ){
