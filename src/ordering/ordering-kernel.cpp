@@ -78,15 +78,14 @@ int main(int argc, char** argv)  {
   vector<vector<int> > kernels;
   unsigned int netSize = translationTable.size();
   int nkernels=netSize;
-  kernels = 
-    GetKernels( similarityMatrix, kernelOrder, klines, nkernels, translationTable);
+  kernels = GetKernels( similarityMatrix, kernelOrder, klines, nkernels, translationTable);
 
   cout<<"Reduced matrix size "<<nkernels<<endl;
   cout<<"Reduced matrix size "<<kernelOrder.size()<<endl;
   cout<<"Reduced matrix size "<<klines.size()<<endl;
  
   if(randomization){
-    kernelOrder = RandomizeOrder( nkernels, nblocks);
+    kernelOrder = RandomizeOrder(nkernels, nblocks);
     cout<<"Randomized\n";
   }
     
