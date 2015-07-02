@@ -56,10 +56,10 @@ int main(int argc, char** argv)  {
   vector<int> translationTable;
   vector<int> kernelOrder,klines;
 
-  int i,j,i1,j1;
+  //int i,j,i1,j1;
   unsigned int iter=0;
   double energy,energyold,minenergy=-1;
-  double x;
+  //double x;
   int nblocks = 1;
 
   ofstream fout;

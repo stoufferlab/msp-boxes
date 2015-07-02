@@ -53,7 +53,7 @@ vector<int> GetNodeOrder(const vector<int>& kernelOrder,
    //0: means  nodeOrder[originalposition]=currentposition
    //1: means nodeOrder[currentposition]=originalposition
 
-  int i,j,k,jmax;
+  unsigned int i,j,k,jmax;
   vector<int> nodeOrder(netSize);
 
   switch(option){
@@ -105,7 +105,7 @@ vector< vector<int> > GetKernels(vector<double>& similarityMatrix,
                                  vector <int>& klines,
                                  int& n,
                                  vector<int>& translationTable){
-  int nn=n,i,j;
+  unsigned int nn=n,i,j;
   vector<int> kernelsize,knodelist;
   vector<vector<int> > kernelList;//list of nodes inside each kernel
   vector<int> kernelOrder;//order of the kernels
@@ -117,7 +117,7 @@ vector< vector<int> > GetKernels(vector<double>& similarityMatrix,
   int kernelCount, nodeCount;
   nodeCount =0;
   kernelCount =0;
-  int k;
+  //int k;
   for (i=0;i<nn; i++){
     if(find(assignedNodes.begin(),assignedNodes.end(),i) == assignedNodes.end()){
       knodelist.push_back(nodeCount);
