@@ -35,7 +35,7 @@ the block is selected so that at low temperature is of size one.
 int ChangeSegmentOrder(vector<int>& order, int line1, int line2, int width){
 
   if( line1 < line2 )
-    rotate(order.begin()+line1,order.begin()+line1+width,order.begin()+line2+width);
+    rotate(order.begin()+line1,order.begin()+line2,order.begin()+line2+width);
   else
     rotate(order.begin()+line2,order.begin()+line1,order.begin()+line1+width);
 
@@ -53,7 +53,7 @@ int MakeChangeVectors(const vector <int>& order,
                       int n,
                       const vector<int>& klines){
 
-  int i,in,in2,j,jmax, nk = klines.size();
+  int i,in,j,jmax, nk = klines.size();
   vector<bool> changed(n,false);
   
   change.clear();
@@ -286,7 +286,7 @@ void AnnealIter(double temperature,
                 vector<int>& order,double& energy,double& minenergy,int nblocks, 
 		            const vector<int>& kline){
   
-  int step,i1,ii1;
+  int step; //,i1,ii1;
   double deltaen;
 
   for( step=0; step<nsteps; step++ ){
