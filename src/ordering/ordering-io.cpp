@@ -100,10 +100,11 @@ vector<int> GetNodeOrder(const vector<int>& kernelOrder,
 
 /*********************************************************************/
 
-vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
-				  vector<int>& originalOrder,
-				  vector <int>& klines, int& n,
-				  vector<int>& translationTable ){
+vector< vector<int> > GetKernels(vector<double>& similarityMatrix,
+                                 vector<int>& originalOrder,
+                                 vector <int>& klines,
+                                 int& n,
+                                 vector<int>& translationTable){
   int nn=n,i,j;
   vector<int> kernelsize,knodelist;
   vector<vector<int> > kernelList;//list of nodes inside each kernel
@@ -118,7 +119,6 @@ vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
   kernelCount =0;
   int k;
   for (i=0;i<nn; i++){
-//     cout<<i<<" "<<nn<<endl;
     if(find(assignedNodes.begin(),assignedNodes.end(),i) == assignedNodes.end()){
       knodelist.push_back(nodeCount);
       kkline.push_back(nodeCount);
@@ -127,26 +127,22 @@ vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
       translationTableNew[nodeCount]=  translationTable[i];	
       nodeCount ++;
       for( j= i + 1; j < nn; j++){
-
-	if(similarityMatrix[ i + j*nn ] == 1.){
-	  knodelist.push_back(nodeCount);
-	  assignedNodes.push_back(j);
-	  translationTableNew[nodeCount] = translationTable[j];	
-	  nodeCount ++;
-	  
-	}
+        if(similarityMatrix[ i + j*nn ] == 1.){
+          knodelist.push_back(nodeCount);
+          assignedNodes.push_back(j);
+          translationTableNew[nodeCount] = translationTable[j];
+          nodeCount ++;
+        }
       }
       kernelCount++;
       kernelList.push_back( knodelist );
       kernelsize.push_back( knodelist.size() );
       knodelist.clear();
-
     }
-    
   }
 
-  cout<<"Count "<<nodeCount <<endl;
-  cout<<assignedNodes.size()<<endl;
+  // cout<<"Count "<<nodeCount <<endl;
+  // cout<<assignedNodes.size()<<endl;
   //Construct new matrix
   for (i=0;i<assignedNodes.size();i++){
     for (j=i;j<assignedNodes.size();j++){
@@ -179,13 +175,14 @@ vector< vector<int> > GetKernels( vector<double>& similarityMatrix,
   cout<<"Total n of nodes "<<count<<endl;
 
   return kernelList;
-
 }
 
 /**************************************************************/
 
-void ReadMatrix(const int format, const char *fileName,
-		vector<int>& transTable , vector<double>& sim ) {
+void ReadMatrix(const int format,
+                const char *fileName,
+                vector<int>& transTable,
+                vector<double>& sim){
 
   ifstream gin;
   gin.open(fileName);
