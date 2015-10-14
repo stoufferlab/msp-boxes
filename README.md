@@ -32,4 +32,26 @@ This produces:
 
 You can view the options of any of these scripts with the `--help` flag.
 
+## Usage
+
+The primary way to use this package is to run the `ordering-kernel` executable
+with something like this:
+
+```sh
+./src/ordering/ordering-kernel -f path/to/matrix.dat
+```
+
+where `path/to/matrix.dat` is a text file that stores the information in the
+matrix. By default, `ordering-kernel` assumes that the matrix will be in a
+format similar to [data/test-matrix.dat]. Using the `-d` flag you can
+optionally specify that the data is stored in a sparse format.
+
+After this program is run, it outputs several files in the working directory,
+the most important of which are:
+
+* `transtable-final.dat` which lists how each input index is mapped to the
+  output index
+
+* `coclas-final.dat` which prints the final reordering of the matrix.
+
 [doi]: http://dx.doi.org/10.1073/pnas.0703740104
