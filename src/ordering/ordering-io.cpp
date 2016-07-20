@@ -118,26 +118,36 @@ vector< vector<int> > GetKernels(vector<double>& similarityMatrix,
   nodeCount =0;
   kernelCount =0;
   //int k;
-  for (i=0;i<nn; i++){
-    if(find(assignedNodes.begin(),assignedNodes.end(),i) == assignedNodes.end()){
+
+  // go row by row in the similarity matrix, identify nodes with similarity==1, and collapse them together into a kernel
+  for(i=0; i<nn; i++){
+    knodelist.clear();
+    if(find(assignedNodes.begin(), assignedNodes.end(), i) == assignedNodes.end()){
+      assignedNodes.push_back(i);
       knodelist.push_back(nodeCount);
       kkline.push_back(nodeCount);
       kernelOrder.push_back(kernelCount);
-      assignedNodes.push_back(i);
       translationTableNew[nodeCount]=  translationTable[i];	
-      nodeCount ++;
-      for( j= i + 1; j < nn; j++){
-        if(similarityMatrix[ i + j*nn ] == 1.){
-          knodelist.push_back(nodeCount);
+      nodeCount++;
+
+      // check which other nodes can be added to i's kernel
+      for(j=i+1; j<nn; j++){
+        if(similarityMatrix[ i + j*nn ] == 1. && find(assignedNodes.begin(), assignedNodes.end(), j) == assignedNodes.end()){
           assignedNodes.push_back(j);
+          knodelist.push_back(nodeCount);
           translationTableNew[nodeCount] = translationTable[j];
           nodeCount ++;
         }
       }
-      kernelCount++;
-      kernelList.push_back( knodelist );
+      
+      // add the current kernel to list of kernels
+      kernelList.push_back(knodelist);
+      
+      // add the size of the kernels to the kernelsize vector
       kernelsize.push_back( knodelist.size() );
-      knodelist.clear();
+
+      // ladies and gentlement, we officially have another kernel
+      kernelCount++;
     }
   }
 
@@ -156,7 +166,7 @@ vector< vector<int> > GetKernels(vector<double>& similarityMatrix,
   similarityMatrix = similarityMatrixNew;
   translationTable = translationTableNew;
 
-  cout<<"size "<<klines.size()<<endl;
+  // cout<<"size "<<klines.size()<<endl;
   ofstream fout( "kernel-size.dat" );
   ofstream fout1( "kernel-list.dat" );
   
