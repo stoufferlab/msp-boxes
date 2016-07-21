@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 // my header files
 #include "ordering-io.hpp"
@@ -62,21 +63,21 @@ vector<int> GetNodeOrder(const vector<int>& kernelOrder,
 
     k=0;
     for(i=0;i<kernelOrder.size();i++){
-       
+
       if(kernelOrder[i]!=kernelOrder.size()-1)
         jmax=klines[kernelOrder[i]+1]-klines[kernelOrder[i]];
       else
         jmax=netSize-klines[kernelOrder[i]];
-       
+
       for(j=0;j<jmax;j++){
         nodeOrder[klines[kernelOrder[i]]+j]=k;
         k++;
       }
-       
+
     }
 
     break;
-  
+
   case 1:
 
     k=0;
@@ -86,12 +87,12 @@ vector<int> GetNodeOrder(const vector<int>& kernelOrder,
         jmax=klines[kernelOrder[i]+1]-klines[kernelOrder[i]];
       else
         jmax=netSize-klines[kernelOrder[i]];
-      
+
       for(j=0;j<jmax;j++){
         nodeOrder[k]=klines[kernelOrder[i]]+j;
         k++;
       }
-       
+
     }
   }
 
@@ -169,7 +170,7 @@ vector< vector<int> > GetKernels(vector<double>& similarityMatrix,
   // cout<<"size "<<klines.size()<<endl;
   ofstream fout( "kernel-size.dat" );
   ofstream fout1( "kernel-list.dat" );
-  
+
   int count = 0;
   for(i = 0; i < kernelsize.size(); i++){
     fout<<kernelsize[i]<<endl;
@@ -178,7 +179,7 @@ vector< vector<int> > GetKernels(vector<double>& similarityMatrix,
       fout1<<kernelList[i][j]<<" ";
     fout1<<endl;
   }
-  
+
   fout.close();
   fout1.close();
 
@@ -203,15 +204,15 @@ void ReadMatrix(const int format,
 
   cout<<"Reading matrix....";
 
-  switch( format ) { 
-    
+  switch( format ) {
+
   case 0 :
     int ii [2];
-    
+
     // determine how many species there are
     transtableTemp.clear();
     while(gin>>ii[0]>>ii[1]>>x){
-      
+
       if(find(transtableTemp.begin(),transtableTemp.end(),ii[0]) == transtableTemp.end()){
         transtableTemp.push_back(ii[0]);
       }
@@ -227,12 +228,14 @@ void ReadMatrix(const int format,
     for(i=0;i<n;i++)
       for(j=0;j<n;j++)
         sim.push_back(0);
-    
+
     gin.open(fileName);
     while(gin>>ii[0]>>ii[1]>>x){
       i = find(transtableTemp.begin(),transtableTemp.end(),ii[0]) - transtableTemp.begin();
       j = find(transtableTemp.begin(),transtableTemp.end(),ii[1]) - transtableTemp.begin();
-
+      if(x<0) {
+          throw std::range_error("matrix values can not be negative");
+      }
       sim[ i + n * j ] = x;
     }
 
@@ -248,7 +251,7 @@ void ReadMatrix(const int format,
         ++count;
     }
     gin.close();
-    
+
     n = count;
 
     transtableTemp.clear();
@@ -263,19 +266,22 @@ void ReadMatrix(const int format,
     for( i=0; i<n; i++ ){
       for( j=0; j<n; j++){
         gin >> x;
+        if(x<0) {
+            throw std::range_error("matrix values can not be negative");
+        }
         sim[ i + n * j ] = x;
       }
     }
 
     break;
-  } 
-  
+  }
+
   transTable = transtableTemp;
   gin.close();
   cout<<"Read\n";
-     
+
 }
-    
+
 /**************************************************************/
 
 void ReadTranslationTable(const char *fileName, vector<int>& transTable) {
@@ -295,9 +301,9 @@ void ReadTranslationTable(const char *fileName, vector<int>& transTable) {
   gin.close();
 
   cout<<"Read\n";
-     
+
 }
-    
+
 /**************************************************************/
 
 void ReadData(const int format, vector<int>& translationTable , vector<double>& similarityMatrix){
@@ -406,7 +412,7 @@ void PrintMatrix (const char* fileName, const vector<double>& sim, const vector<
 
 //   cout<<"printing"<<endl;
 
-  ofstream fo(fileName); 
+  ofstream fo(fileName);
 
   switch(mode){
 
@@ -423,15 +429,15 @@ void PrintMatrix (const char* fileName, const vector<double>& sim, const vector<
     break;
 
   case 1://coclas style
-    
+
     for(i=0;i<n;i++){
       i1=nodeOrder[i];
-     
+
       for(j=0;j<n;j++){
 	j1=nodeOrder[j];
 	fo<<i <<" "<<j<<" "<<sim[i1+j1*n]<<endl;
       }
-   
+
     }
     break;
 
@@ -446,15 +452,15 @@ void PrintTranstable(const char* fileName, const vector<int>& translationTable, 
 
   k=0;
   ofstream outFile(fileName);
-  
+
   for(i=0;i<order.size();i++){
     l=order[i];
-     
+
     for(j=0;j<kernels[l].size();j++){
       outFile<<k<<" "<<translationTable[kernels[l][j]]<<endl;
       k++;
     }
-  }   
+  }
 
   outFile.close();
 }
