@@ -18,17 +18,14 @@ After cloning the repository, you can build the executables by running:
 
 This produces:
 
-* `src/ordering/ordering-kernal`.This is the main script you should use. It
-  uses simulated annealing to identify the ordering of rows/columns that
+* `src/ordering/ordering-kernel`.This is the script you should use first. It groups identical rows/columns into kernels and then
+  uses simulated annealing to identify the ordering of those kernels that
   optimizes the BIC of the box model.
 
-* `src/ordering/ordering-exhaustive`. This exhaustively searches the ordering
-  of rows/columns that optimizes the BIC of the box model.
+* `src/ordering/ordering-exhaustive`. This is the script you should use second. It exhaustively checks if reordering of adjacent kernels can further improve the the BIC of the box model.
 
 * `src/boxes/main_boxes_greedy_nbox_ic_wdiag_kernel`. Starting from an initial
-  row ordering, this optimizes the row ordering using a steepest decent
-  approach. This is effectively a zero temperature quenching of the simulating
-  annealing procedure.
+  ordering, this identifies break points between "communities" in the matrix and accepts them based on steepest decent and whether or not the BIC of the clustered model is significantly improved.
 
 You can view the options of any of these scripts with the `--help` flag.
 
@@ -49,9 +46,31 @@ optionally specify that the data is stored in a sparse format.
 After this program is run, it outputs several files in the working directory,
 the most important of which are:
 
-* `transtable-final.dat` which lists how each input index is mapped to the
-  output index
-
 * `coclas-final.dat` which prints the final reordering of the matrix.
+
+* `transtable-final.dat` which lists how each input index is mapped to the
+  output index.
+
+This can then be followed up by the additional optimization step:
+
+```sh
+./src/ordering/ordering-exhaustive -f path/to/coclas-final.dat
+```
+
+which will generate two additional output files of particular interest:
+
+* `coclas-exhaustive.dat` which prints the exhaustive reordering of the matrix.
+
+* `transtable-exhaustive.dat` which lists how each input index is mapped to the
+  output index. Note that, following the typical workflow, this translates from `coclas-final.dat` to `coclas-exhaustive.dat` and not from the *original* matrix (i.e. `matrix.dat` in this example).
+
+Given either of these reordered output matrices, it is then possible to identify the most parsimonious grouping of rows/columns into "communities" based on BIC using:
+
+```sh
+./src/boxes/main_boxes_greedy_nbox_ic_wdiag_kernel N path/to/coclas-exhaustive.dat 1 0
+```
+
+where `N` is the size of the matrix and the final two arguments are poorly commented at present (though these default values should work in the vast majority of cases).
+
 
 [doi]: http://dx.doi.org/10.1073/pnas.0703740104
