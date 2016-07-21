@@ -64,16 +64,19 @@ int main(int argc, char** argv)  {
 
   ofstream fout;
 
-  if(restart){
-    ReadData(temperature, factor, iter, format, translationTable, similarityMatrix, minenergy);
-    ++iter;
-    temperature *= factor;
-    fout.open("outt.dat",ifstream::app);
-  }else{
-    ReadMatrix(format, inFile, translationTable, similarityMatrix);
-    PrintValue("temperature-factor.dat",factor);
-    fout.open("outt.dat");
+  try {
+    if(restart){
+      ReadData(temperature, factor, iter, format, translationTable, similarityMatrix, minenergy);
+      ++iter;
+      temperature *= factor;
+      fout.open("outt.dat",ifstream::app);
+    }else{
+      ReadMatrix(format, inFile, translationTable, similarityMatrix);
+      PrintValue("temperature-factor.dat",factor);
+      fout.open("outt.dat");
+    }
   }
+  catch (...) { cerr << endl << "An error occurred while reading in the data. Please see the --help for instructions on proper formatting." << endl; return 1; }
 
   vector<vector<int> > kernels;
   unsigned int netSize = translationTable.size();
