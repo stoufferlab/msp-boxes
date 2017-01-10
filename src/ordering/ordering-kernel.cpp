@@ -97,16 +97,16 @@ int main(int argc, char** argv)  {
   if (Nsteps < 10) Nsteps = 10;//at least 10 steps in annealing process
   //cout << "Nteps: "<<Nsteps<<endl;
 
+  // if the temperature has not been specified in some manner, estimate a good starting point
+  if(temperature == -1){
+    InitialTemp(temperature, similarityMatrix, translationTable, kernels, 50, netSize, kernelOrder, nblocks, klines);
+  }
+	
   energyold = energy = ComputeEnergy( similarityMatrix, netSize, kernelOrder, klines);
   if(minenergy == -1)
     minenergy = energy;
 
   cout<<"e: "<<energy<<endl;
-
-  // if the temperature has not been specified in some manner, estimate a good starting point
-  if(temperature == -1){
-    InitialTemp(temperature, similarityMatrix, translationTable, kernels, 50, netSize, kernelOrder, nblocks, klines);
-  }
 
   if (nkernels>2){
 
